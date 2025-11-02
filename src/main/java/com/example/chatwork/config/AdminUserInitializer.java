@@ -24,7 +24,7 @@ public class AdminUserInitializer {
     @Bean
     public CommandLineRunner createDefaultAdminUser() {
         return args -> {
-            String username = "admin";
+            String username = "anakae@jicpa-work.com";
 
             // すでに存在していればスキップ
             if (userRepository.findByUsername(username).isPresent()) {
@@ -35,7 +35,7 @@ public class AdminUserInitializer {
             // 存在しない場合は作成
             User admin = new User();
             admin.setUsername(username);
-            admin.setPassword(passwordEncoder.encode("admin123")); // ← 初期パスワード
+            admin.setPassword(passwordEncoder.encode("GUkFUx73lURakbny7A7A")); // ← 初期パスワード
             admin.setChatworkToken(null);
 
             userRepository.save(admin);
