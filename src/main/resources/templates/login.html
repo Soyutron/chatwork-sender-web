@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chatwork Sender Login</title>
+
+  <style>
+    body {
+      font-family: "Segoe UI", "Hiragino Sans", sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+
+    form {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      width: 320px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95em;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    small {
+      display: block;
+      margin-top: 10px;
+      color: #666;
+      font-size: 0.85em;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>🔐 Chatwork Sender ログイン</h2>
+
+  <form method="post" action="/login">
+    <div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
+
+    <input type="text" name="username" placeholder="ユーザー名" required />
+    <input type="password" name="password" placeholder="パスワード" required />
+    <button type="submit">ログイン</button>
+    <small>アカウントをお持ちでない場合は管理者にお問い合わせください。</small>
+  </form>
+</body>
+</html>

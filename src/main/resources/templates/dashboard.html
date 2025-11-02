@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chatwork Sender Dashboard</title>
+  <style>
+    /* ===============================
+       🌐 Global Styles
+    =============================== */
+    body {
+      font-family: "Segoe UI", "Hiragino Sans", sans-serif;
+      margin: 30px;
+      background: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    h2, h3 { margin-bottom: 10px; }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+
+    textarea { resize: vertical; min-height: 100px; font-size: 1em; }
+
+    button {
+      background-color: #0078d7;
+      border: none;
+      color: #fff;
+      padding: 10px 18px;
+      margin: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95em;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover { background-color: #005fa3; }
+
+    section {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    }
+
+    small { color: #666; }
+
+    /* ===============================
+       🎨 Group Selection
+    =============================== */
+    .group-room-section {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .group-controls {
+      background: linear-gradient(135deg, #f0f7ff, #ffffff);
+      border: 1px solid #cce0ff;
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 8px rgba(0, 120, 215, 0.05);
+    }
+
+    .group-controls button {
+      display: inline-block;
+      width: 48%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    .group-controls p { font-size: 0.9em; color: #666; margin-top: 10px; }
+
+    .room-list {
+      border: none;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .room-list label {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      margin: 3px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .room-list label:hover { background: #eef6ff; }
+
+    .room-list input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      accent-color: #0078d7;
+    }
+
+    .room-list label.checked {
+      font-weight: 600;
+      color: #0078d7;
+      background: #f0f7ff;
+    }
+
+    /* ===============================
+       🔍 Search Bar
+    =============================== */
+    #roomSearch {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    /* ===============================
+       📢 Toast Notification
+    =============================== */
+    #toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #0078d7;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.3s ease;
+      transform: translateY(-10px);
+      z-index: 9999;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <h2>💬 Chatwork 一斉送信ツール</h2>
+
+  <!-- 🔑 トークン設定 -->
+  <section>
+    <h3>🔑 Chatwork API トークン</h3>
+    <input type="text" id="token" placeholder="Chatwork API Token を入力してください" />
+    <button id="saveTokenBtn">保存</button>
+  </section>
+
+  <!-- ⭐ グループ選択＋お気に入り -->
+  <section>
+    <h3>⭐ グループ選択＆お気に入りセット</h3>
+
+    <div class="group-room-section">
+      <div class="group-controls">
+        <h4>お気に入りグループセット</h4>
+        <select id="groupSetSelect"><option value="">（未選択）</option></select>
+        <div>
+          <button id="newGroupBtn">💾 新規保存</button>
+          <button id="updateGroupBtn">✏️ 上書き保存</button>
+        </div>
+        <div>
+          <button id="renameGroupBtn" style="background:#6c757d;">✏️ 名前変更</button>
+          <button id="deleteGroupBtn" style="background:#d9534f;">🗑️ 削除</button>
+        </div>
+        <p>お気に入りを選ぶと右側のルームが反映されます。</p>
+      </div>
+
+      <!-- 右側 -->
+      <div>
+        <input type="text" id="roomSearch" placeholder="🔍 ルームを検索..." />
+        <div class="room-list" id="rooms">
+          <label><input type="checkbox" />営業部グループ</label>
+          <label><input type="checkbox" />開発チーム</label>
+          <label><input type="checkbox" />サポート部</label>
+          <label><input type="checkbox" />テスト用ルーム</label>
+          <label><input type="checkbox" />総務部</label>
+          <label><input type="checkbox" />マーケティングチーム</label>
+          <label><input type="checkbox" />管理部</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 📝 メッセージ送信 -->
+  <section>
+    <h3>📝 メッセージ・ファイル送信</h3>
+    <textarea id="message" placeholder="送信するメッセージを入力してください"></textarea>
+    <input type="file" id="fileInput" />
+    <small>※ ファイルを選択しない場合はメッセージのみ送信されます。</small><br />
+    <button id="sendBtn">📤 一斉送信</button>
+    <button id="cancelBtn" style="background:#d9534f;">⏹️ 中止</button>
+  </section>
+
+  <!-- 🕓 履歴 -->
+  <section>
+    <h3>🕓 送信履歴</h3>
+    <button id="loadHistoryBtn">履歴を読み込む</button>
+    <div id="historyArea"></div>
+  </section>
+
+  <!-- 📢 トースト通知 -->
+  <div id="toast"></div>
+
+  <script>
+    // ✅ チェック強調
+    document.addEventListener("change", (e) => {
+      if (e.target.type === "checkbox") {
+        e.target.closest("label").classList.toggle("checked", e.target.checked);
+      }
+    });
+
+    // 🔍 ルーム検索
+    document.getElementById("roomSearch").addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll("#rooms label").forEach((label) => {
+        const text = label.textContent.toLowerCase();
+        label.style.display = text.includes(q) ? "flex" : "none";
+      });
+    });
+
+    // 💡 トースト表示
+    function showToast(message, color = "#0078d7") {
+      const toast = document.getElementById("toast");
+      toast.style.background = color;
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+  </script>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

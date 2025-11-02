@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatwork-sender-prod
+    ports:
+      - "9090:9090"
+    restart: always
+    networks:
+      - app-net
+    volumes:
+      - ./data:/app/data
+
+networks:
+  app-net:
+    driver: bridge
