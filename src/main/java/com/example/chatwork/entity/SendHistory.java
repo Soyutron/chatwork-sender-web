@@ -17,9 +17,12 @@ public class SendHistory {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(columnDefinition = "TEXT")
     private String roomName;
     private Long roomId;
+    @Column(columnDefinition = "TEXT")
     private String message;
+    @Column(columnDefinition = "TEXT")
     private String fileName;
     private LocalDateTime sentAt = LocalDateTime.now();
 }
